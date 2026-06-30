@@ -30,10 +30,69 @@ int main(const int argc, char* argv[])
         // Get wanted data slice
         auto data_slice = utils::str_slice(file_contents, "DATA;", "ENDSEC;");
 
-        // Debug (temporary)
-        std::cout << data_slice << std::endl;
+        // Statement string, flags & counters to track parsing state
+        std::string current_statement{};
+        bool in_string = false;
+        int paren_depth = 0;
 
-        // TODO: Implement formatting
+        // Go through all symbols of data slice
+        for (char c : data_slice)
+        {
+            // String literals stats/ends
+            if (c == '\'')
+            {
+                in_string = !in_string;
+                current_statement += c;
+                continue;
+            }
+
+            // Currently handling string literal - just add symbol
+            if (in_string)
+            {
+                current_statement += c;
+            }
+            // Not string literal
+            else
+            {
+                // Ignore all spaces & end-lines
+                if (std::isspace(static_cast<unsigned char>(c))) {
+                    continue;
+                }
+                // Handle opening parenthesis
+                if (c == '(')
+                {
+                    paren_depth++;
+                }
+                // Handle closing parenthesis
+                else if (c == ')')
+                {
+                    paren_depth--;
+                    if (paren_depth < 0){
+                        throw std::runtime_error("Unmatched parenthesis");
+                    }
+                }
+
+                current_statement += c;
+
+                // Handle statement end
+                if (c == ';'){
+                    if (paren_depth != 0){
+                        throw std::runtime_error("Unmatched parenthesis");
+                    }
+
+                    output_file << current_statement << std::endl;
+                    current_statement.clear();
+                }
+            }
+        }
+
+        // Handle unterminated statement cases
+        if (!current_statement.empty()){
+            throw std::runtime_error("Unterminated statement before EOF");
+        }
+        if (in_string){
+            throw std::runtime_error("Unterminated string literal before end of DATA section");
+        }
 
     }
     catch (const std::ios_base::failure& e)
