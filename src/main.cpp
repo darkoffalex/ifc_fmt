@@ -27,8 +27,14 @@ int main(const int argc, char* argv[])
 
         // Read input file contents
         const auto file_contents = utils::read_to_string(input_file);
-        // Get wanted data slice
-        auto data_slice = utils::str_slice(file_contents, "DATA;", "ENDSEC;");
+        // Data section slice
+        auto data = utils::str_slice(file_contents, "DATA;", "ENDSEC;");
+        // Before & after section slices
+        auto before_data = std::string_view{file_contents.data(), data.start_pos};
+        auto after_data = std::string_view{file_contents.data() + data.end_pos, file_contents.size() - data.end_pos};
+
+        // Write header
+        output_file << before_data << std::endl;
 
         // Statement string, flags & counters to track parsing state
         std::string current_statement{};
@@ -36,7 +42,7 @@ int main(const int argc, char* argv[])
         int paren_depth = 0;
 
         // Go through all symbols of data slice
-        for (char c : data_slice)
+        for (char c : data.slice)
         {
             // String literals stats/ends
             if (c == '\'')
@@ -93,6 +99,9 @@ int main(const int argc, char* argv[])
         if (in_string){
             throw std::runtime_error("Unterminated string literal before end of DATA section");
         }
+
+        // Write footer
+        output_file << after_data << std::endl;
 
     }
     catch (const std::ios_base::failure& e)

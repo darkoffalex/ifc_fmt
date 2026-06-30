@@ -26,14 +26,25 @@ namespace utils
     }
 
     /**
+     * Slice info structure
+     */
+    struct SliceInfo
+    {
+        std::string_view slice;
+        size_t start_token_len;
+        size_t end_token_len;
+        size_t start_pos;
+        size_t end_pos;
+    };
+
+    /**
      * Get a slice of string
      * @param str Source string
-     * @param start Start keyword
-     * @param end End keyword
-     * @return Slice string view
-     * @throws std::runtime_error
+     * @param start Start token
+     * @param end End token
+     * @return Slice info structure
      */
-    inline std::string_view str_slice(const std::string& str, const std::string& start, const std::string& end)
+    inline SliceInfo str_slice(const std::string& str, const std::string& start, const std::string& end)
     {
         // Find start position
         const size_t start_pos = str.find(start);
@@ -48,8 +59,12 @@ namespace utils
         }
 
         // Get slice
-        const size_t content_start = start_pos + start.size();
-        const size_t content_length = end_pos - content_start;
-        return std::string_view{str.data() + content_start, content_length};
+        SliceInfo si{};
+        si.start_pos = start_pos + start.size();
+        si.end_pos = end_pos;
+        si.start_token_len = start.size();
+        si.end_token_len = end.size();
+        si.slice = std::string_view{str.data() + si.start_pos, si.end_pos - si.start_pos};
+        return si;
     }
 }

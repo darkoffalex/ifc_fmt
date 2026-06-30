@@ -3,6 +3,7 @@
 .idea
 bin
 out
+output
 build
 cmake-build-*
 CMakeSettings.json
