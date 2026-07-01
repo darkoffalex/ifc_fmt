@@ -1,40 +1,12 @@
 #include "pch.h"
-#include "utils.h"
+#include <formatter/formatter.h>
 
-/**
- * Entry point
- * @param argc Argument count
- * @param argv Arguments
- * @return Exit code (0 = success)
- */
-int main(const int argc, char* argv[])
+namespace fmt
 {
-    try
+    std::string fmt_data_section(const std::string_view& section_slice)
     {
-        // Ensure arguments
-        if (argc < 3){
-            throw std::runtime_error("Usage: " + std::string(argv[0]) + " <input_file.ifc> <output_file.ifc>");
-        }
-
-        // Open files (read & write)
-        std::ifstream input_file;
-        input_file.exceptions(std::ios::failbit | std::ios::badbit);
-        input_file.open(argv[1], std::ios::in);
-
-        std::ofstream output_file;
-        output_file.exceptions(std::ios::failbit | std::ios::badbit);
-        output_file.open(argv[2], std::ios::out | std::ios::trunc);
-
-        // Read input file contents
-        const auto file_contents = utils::read_to_string(input_file);
-        // Data section slice
-        auto data = utils::str_slice(file_contents, "DATA;", "ENDSEC;");
-        // Before & after section slices
-        auto before_data = std::string_view{file_contents.data(), data.start_pos};
-        auto after_data = std::string_view{file_contents.data() + data.end_pos, file_contents.size() - data.end_pos};
-
-        // Write header
-        output_file << before_data << std::endl;
+        // Formatted result
+        std::stringstream output;
 
         // Statement string, flags & counters to track parsing state
         std::string current_statement{};
@@ -42,7 +14,7 @@ int main(const int argc, char* argv[])
         int paren_depth = 0;
 
         // Go through all symbols of data slice
-        for (char c : data.slice)
+        for (const char c : section_slice)
         {
             // String literals stats/ends
             if (c == '\'')
@@ -86,7 +58,7 @@ int main(const int argc, char* argv[])
                         throw std::runtime_error("Unmatched parenthesis");
                     }
 
-                    output_file << current_statement << std::endl;
+                    output << current_statement << std::endl;
                     current_statement.clear();
                 }
             }
@@ -100,20 +72,6 @@ int main(const int argc, char* argv[])
             throw std::runtime_error("Unterminated string literal before end of DATA section");
         }
 
-        // Write footer
-        output_file << after_data << std::endl;
-
+        return output.str();
     }
-    catch (const std::ios_base::failure& e)
-    {
-        std::cerr << "Can't open file: " + std::string(e.what()) << std::endl;
-        return EXIT_FAILURE;
-    }
-    catch (const std::runtime_error& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
 }

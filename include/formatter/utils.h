@@ -1,13 +1,16 @@
 #pragma once
 
-namespace utils
+#include <string>
+#include <string_view>
+
+namespace fmt::utils
 {
     /**
      * Read file to string
      * @param stream Input file stream
      * @return File content string
      */
-    inline std::string read_to_string(std::ifstream& stream)
+    inline std::string str_read(std::ifstream& stream)
     {
         // Get size in bytes
         stream.seekg(0, std::ios::end);
@@ -28,7 +31,7 @@ namespace utils
     /**
      * Slice info structure
      */
-    struct SliceInfo
+    struct StringSliceInfo
     {
         std::string_view slice;
         size_t start_token_len;
@@ -44,7 +47,7 @@ namespace utils
      * @param end End token
      * @return Slice info structure
      */
-    inline SliceInfo str_slice(const std::string& str, const std::string& start, const std::string& end)
+    inline StringSliceInfo str_slice(const std::string& str, const std::string& start, const std::string& end)
     {
         // Find start position
         const size_t start_pos = str.find(start);
@@ -59,7 +62,7 @@ namespace utils
         }
 
         // Get slice
-        SliceInfo si{};
+        StringSliceInfo si{};
         si.start_pos = start_pos + start.size();
         si.end_pos = end_pos;
         si.start_token_len = start.size();
