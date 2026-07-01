@@ -5,11 +5,14 @@ namespace fmt
 {
     std::string fmt_data_section(const std::string_view& section_slice)
     {
-        // Formatted result
-        std::stringstream output;
+        // Formatted result (reserve to avoid re-allocations)
+        std::string output;
+        output.reserve(section_slice.size());
 
         // Statement string, flags & counters to track parsing state
         std::string current_statement{};
+        current_statement.reserve(256);
+
         bool in_string = false;
         int paren_depth = 0;
 
@@ -58,7 +61,7 @@ namespace fmt
                         throw std::runtime_error("Unmatched parenthesis");
                     }
 
-                    output << current_statement << std::endl;
+                    output += current_statement + '\n';
                     current_statement.clear();
                 }
             }
@@ -72,6 +75,6 @@ namespace fmt
             throw std::runtime_error("Unterminated string literal before end of DATA section");
         }
 
-        return output.str();
+        return output;
     }
 }
