@@ -1,6 +1,12 @@
 #include "pch.h"
 #include <formatter/formatter.h>
 
+/**
+ * Entry point
+ * @param argc Argument count (3 required)
+ * @param argv File paths arguments
+ * @return Exit code
+ */
 int main(const int argc, char* argv[])
 {
     try
