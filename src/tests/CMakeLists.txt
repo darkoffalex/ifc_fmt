@@ -10,7 +10,11 @@ FetchContent_MakeAvailable(Catch2)
 # Auto-test executable sources
 add_executable(Tests
         simple.cpp
+        files.cpp
 )
+
+# Configure target
+add_default_configurations(Tests tests)
 
 # Link with formatter lib & testing framework
 target_link_libraries(Tests PRIVATE

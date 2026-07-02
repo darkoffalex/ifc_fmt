@@ -1,9 +1,10 @@
 #include "pch.h"
 #include <formatter/formatter.h>
+#include <formatter/utils.h>
 
 namespace fmt
 {
-    std::string fmt_data_section(const std::string_view& section_slice)
+    std::string format_data_section(const std::string_view& section_slice)
     {
         // Formatted result (reserve to avoid re-allocations)
         std::string output;
@@ -76,5 +77,37 @@ namespace fmt
         }
 
         return output;
+    }
+
+    void format_file(const std::string& input_file, const std::string& output_file)
+    {
+        // Open files (read & write)
+        std::ifstream ifs;
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);
+        ifs.open(input_file, std::ios::in);
+
+        std::ofstream ofs;
+        ofs.exceptions(std::ios::failbit | std::ios::badbit);
+        ofs.open(output_file, std::ios::out | std::ios::trunc);
+
+        // Read input file contents
+        const auto file_contents = utils::str_read(ifs);
+
+        // Get data section slice & format it
+        auto data = fmt::utils::str_slice(file_contents, "DATA;", "ENDSEC;");
+        auto data_formatted = fmt::format_data_section(data.slice);
+
+        // Before & after section slices (header & footer)
+        auto before_data = std::string_view{file_contents.data(), data.start_pos};
+        auto after_data = std::string_view{file_contents.data() + data.end_pos, file_contents.size() - data.end_pos};
+
+        // Write all sections to file
+        ofs << before_data << std::endl;
+        ofs << data_formatted;
+        ofs << after_data << std::endl;
+
+        // Close files
+        ifs.close();
+        ofs.close();
     }
 }

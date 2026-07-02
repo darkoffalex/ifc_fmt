@@ -2,6 +2,7 @@
 
 #include <string>
 #include <string_view>
+#include <fstream>
 
 namespace fmt::utils
 {
@@ -26,6 +27,19 @@ namespace fmt::utils
         }
 
         return "";
+    }
+
+    /**
+     * Read file to string
+     * @param file_path Input file path
+     * @return File string content
+     */
+    inline std::string str_read(const std::string& file_path)
+    {
+        std::ifstream ifs;
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);
+        ifs.open(file_path, std::ios::in);
+        return str_read(ifs);
     }
 
     /**
