@@ -67,7 +67,10 @@ function(add_default_configurations TARGET_NAME TARGET_BIN_NAME)
     endif()
 endfunction()
 
+# Enable CTest for whole project
+enable_testing()
+
 # Add sub-projects
 add_subdirectory(src/formatter)
 add_subdirectory(src/app)
-add_subdirectory(src/tests)
+add_subdirectory(tests)

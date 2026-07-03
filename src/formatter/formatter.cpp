@@ -94,8 +94,8 @@ namespace fmt
         const auto file_contents = utils::str_read(ifs);
 
         // Get data section slice & format it
-        auto data = fmt::utils::str_slice(file_contents, "DATA;", "ENDSEC;");
-        auto data_formatted = fmt::format_data_section(data.slice);
+        auto data = utils::str_slice(file_contents, "DATA;", "ENDSEC;");
+        auto data_formatted = format_data_section(data.slice);
 
         // Before & after section slices (header & footer)
         auto before_data = std::string_view{file_contents.data(), data.start_pos};
@@ -104,7 +104,7 @@ namespace fmt
         // Write all sections to file
         ofs << before_data << std::endl;
         ofs << data_formatted;
-        ofs << after_data << std::endl;
+        ofs << after_data;
 
         // Close files
         ifs.close();

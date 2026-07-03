@@ -28,15 +28,9 @@ bin\Release\app_x64.exe <input.ifc> <output.ifc>
 
 ## Run tests
 
-Run compiled `tests_x64` (or `tests_x86`) binary file. Make sure the working folder is correct (you are in the executable directory).
-
-```bash
-cd bin/Release
-# Windows
-tests_x64.exe
-# Linux/macOS
-./tests_x64
-```
+There are two ways to run tests:
+- Run command `ctest -C Release --output-on-failure` after building the project (make soure you are in the `build` directory before running this command)
+- Run the compiled `tests_x64` (or `tests_x86`) binary file.
 
 ## Approach at high level
 The project is divided into three parts: 
@@ -68,4 +62,4 @@ The entire file is read into memory at once. To prevent unnecessary memory alloc
    Enhance the state machine to track line and column numbers during parsing. If a syntax error occurs (e.g., an unclosed string literal or an unmatched parenthesis), the tool would report the exact location of the anomaly, significantly improving the developer experience.
 
 3. **In-place formatting and batch processing:**
-   Add support for an in-place modification flag (e.g., `-i` similar to `clang-format`) to overwrite the original file without requiring an explicit output path. Additionally, implement batch processing to format entire directories of IFC files at once.
+   Add support for in-place modification to overwrite the original file without requiring an explicit output path. Additionally, implement batch processing to format entire directories of IFC files at once.

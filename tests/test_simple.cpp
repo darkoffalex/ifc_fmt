@@ -1,4 +1,4 @@
-#include <catch2/catch_test_macros.hpp>
+#include "pch.h"
 #include <formatter/formatter.h>
 
 TEST_CASE("1. Whitespace removal outside strings", "[formatting]")
