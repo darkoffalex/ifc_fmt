@@ -3,7 +3,8 @@
 .idea
 bin
 out
-output
+/output/*
+/tests/output/*
 build
 cmake-build-*
 CMakeSettings.json

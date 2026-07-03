@@ -24,6 +24,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>)
 # Use static runtime linking
 option(STATIC_RUNTIME "Use static runtime linking" OFF)
 
+# Propagate runtime library choice to ALL targets (including FetchContent deps like Catch2)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    if(STATIC_RUNTIME)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    else()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    endif()
+endif()
+
 # Architecture detection
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH_NAME "x64")
@@ -45,11 +54,6 @@ function(add_default_configurations TARGET_NAME TARGET_BIN_NAME)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         target_compile_definitions(${TARGET_NAME} PRIVATE "-DNOMINMAX")
         target_compile_options(${TARGET_NAME} PRIVATE /W3 /permissive- /fp:fast)
-        if(STATIC_RUNTIME)
-            set_property(TARGET ${TARGET_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-        else()
-            set_property(TARGET ${TARGET_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>")
-        endif()
 
     # For GNU/MinGW/Clang compilers
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
