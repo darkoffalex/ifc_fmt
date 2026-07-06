@@ -54,6 +54,9 @@ The entire file is read into memory at once. To prevent unnecessary memory alloc
 3. **File structure:**
    The file has exactly one DATA; section.
 
+4. **Line endings:**
+   The golden files (for tests) use LF line endings (not CRLF)
+
 ## What I would do next with more time
 1. **Stream-based processing:**
    Transition from loading the entire file into RAM to a streaming or chunk-based reading approach. Since real-world files can be several gigabytes in size, processing the file sequentially using I/O streams would make the tool highly scalable regardless of available memory.
