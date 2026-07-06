@@ -84,11 +84,11 @@ namespace fmt
         // Open files (read & write)
         std::ifstream ifs;
         ifs.exceptions(std::ios::failbit | std::ios::badbit);
-        ifs.open(input_file, std::ios::in);
+        ifs.open(input_file, std::ios::in | std::ios::binary);
 
         std::ofstream ofs;
         ofs.exceptions(std::ios::failbit | std::ios::badbit);
-        ofs.open(output_file, std::ios::out | std::ios::trunc);
+        ofs.open(output_file, std::ios::out | std::ios::trunc | std::ios::binary);
 
         // Read input file contents
         const auto file_contents = utils::str_read(ifs);
@@ -101,10 +101,16 @@ namespace fmt
         auto before_data = std::string_view{file_contents.data(), data.start_pos};
         auto after_data = std::string_view{file_contents.data() + data.end_pos, file_contents.size() - data.end_pos};
 
-        // Write all sections to file
-        ofs << before_data << std::endl;
-        ofs << data_formatted;
-        ofs << after_data;
+        // Build result string
+        std::string result;
+        result.reserve(data_formatted.size() + before_data.size() + after_data.size());
+        result += before_data; result += '\n';
+        result += data_formatted;
+        result += after_data;
+
+        // Normalize newlines
+        auto result_normalized = utils::normalize_newlines(result);
+        ofs << result_normalized;
 
         // Close files
         ifs.close();

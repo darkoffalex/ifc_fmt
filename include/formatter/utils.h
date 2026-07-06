@@ -38,7 +38,7 @@ namespace fmt::utils
     {
         std::ifstream ifs;
         ifs.exceptions(std::ios::failbit | std::ios::badbit);
-        ifs.open(file_path, std::ios::in);
+        ifs.open(file_path, std::ios::in | std::ios::binary);
         return str_read(ifs);
     }
 
@@ -83,5 +83,35 @@ namespace fmt::utils
         si.end_token_len = end.size();
         si.slice = std::string_view{str.data() + si.start_pos, si.end_pos - si.start_pos};
         return si;
+    }
+
+    /**
+     * Normalizes new-lines (convets all newlines to unix LFs)
+     * @param text Input string
+     * @return Normalized new-lines string
+     */
+    inline std::string normalize_newlines(const std::string_view text)
+    {
+        std::string result;
+        result.reserve(text.size());
+
+        for (std::size_t i = 0; i < text.size(); ++i)
+        {
+            if (text[i] == '\r')
+            {
+                if (i + 1 < text.size() && text[i + 1] == '\n')
+                {
+                    ++i;
+                }
+
+                result += '\n';
+            }
+            else
+            {
+                result += text[i];
+            }
+        }
+
+        return result;
     }
 }
